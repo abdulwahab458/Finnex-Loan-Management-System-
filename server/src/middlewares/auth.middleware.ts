@@ -7,6 +7,7 @@ export interface AuthRequest extends Request {
     email: string;
     role: string;
   };
+  cookies: Record<string, string>;
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,7 +21,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
     req.user = decoded;
     next();
-  } catch (error) {
+  } catch {
     res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
@@ -33,7 +34,7 @@ export const optionalAuthMiddleware = (req: AuthRequest, res: Response, next: Ne
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret') as any;
       req.user = decoded;
     }
-  } catch (error) {
+  } catch {
     // Continue even if token is invalid
   }
 

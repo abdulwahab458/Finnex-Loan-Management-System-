@@ -10,7 +10,7 @@ export const getSalesLeads = async (req: AuthRequest, res: Response) => {
 
     // Enrich with profile status
     const leads = await Promise.all(
-      borrowers.map(async (borrower) => {
+      borrowers.map(async (borrower: any) => {
         const profile = await BorrowerProfile.findOne({ userId: borrower._id });
         const loan = await Loan.findOne({ borrowerId: borrower._id });
 
@@ -61,7 +61,7 @@ export const getDisbursementLoans = async (req: AuthRequest, res: Response) => {
     const { tab, search, startDate, endDate } = req.query as any;
     const searchText = String(search || '').trim();
 
-    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\\$&`);
 
     // Build base filters
     const pendingFilter: any = { status: 'sanctioned' };
@@ -114,7 +114,7 @@ export const getDisbursementLoans = async (req: AuthRequest, res: Response) => {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
     const todaysSanctioned = await Loan.find({ status: 'sanctioned', sanctionedAt: { $gte: todayStart, $lte: todayEnd } });
-    const totalAmountToDisburseToday = todaysSanctioned.reduce((s, l) => s + (l.loanAmount || 0), 0);
+    const totalAmountToDisburseToday = todaysSanctioned.reduce((s: number, l: any) => s + (l.loanAmount || 0), 0);
 
     // Disbursed this month
     const now = new Date();
@@ -122,7 +122,7 @@ export const getDisbursementLoans = async (req: AuthRequest, res: Response) => {
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
     const disbursedThisMonth = await Loan.find({ status: { $in: ['disbursed', 'closed'] }, disbursedAt: { $gte: monthStart, $lte: monthEnd } });
     const totalLoansDisbursedThisMonth = disbursedThisMonth.length;
-    const totalAmountDisbursedThisMonth = disbursedThisMonth.reduce((s, l) => s + (l.loanAmount || 0), 0);
+    const totalAmountDisbursedThisMonth = disbursedThisMonth.reduce((s: number, l: any) => s + (l.loanAmount || 0), 0);
 
     res.status(200).json({
       loans,
@@ -146,7 +146,7 @@ export const getCollectionLoans = async (req: AuthRequest, res: Response) => {
     const searchText = String(search || '').trim();
     const filterName = String(filter || 'all').trim();
 
-    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, String.raw`\\$&`);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -158,9 +158,9 @@ export const getCollectionLoans = async (req: AuthRequest, res: Response) => {
         .sort({ disbursedAt: -1, closedAt: -1, sanctionedAt: -1, createdAt: -1 });
 
       const enrichedLoans = await Promise.all(
-        loans.map(async (loan) => {
+        loans.map(async (loan: any) => {
           const payments = await Payment.find({ loanId: loan._id }).populate('recordedBy', 'fullName email').sort({ paymentDate: -1, createdAt: -1 });
-          const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+          const totalPaid = payments.reduce((sum: number, p: any) => sum + p.amount, 0);
           const outstandingBalance = Math.max(loan.totalRepayment - totalPaid, 0);
           const repaymentEndDate = loan.disbursedAt
             ? new Date(new Date(loan.disbursedAt).getTime() + loan.tenure * 24 * 60 * 60 * 1000)

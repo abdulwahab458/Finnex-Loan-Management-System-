@@ -1,6 +1,6 @@
 import multer, { StorageEngine } from 'multer';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 
 const uploadDir = process.env.UPLOAD_DIR || './uploads';
 
@@ -38,6 +38,6 @@ export const uploadMiddleware = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880'), // 5MB default
+    fileSize: Number.parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB default
   },
 });

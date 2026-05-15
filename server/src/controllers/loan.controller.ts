@@ -104,8 +104,11 @@ export const approveLoan = async (req: AuthRequest, res: Response) => {
     }
 
     if (action === 'approve') {
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
       loan.status = 'sanctioned';
-      loan.sanctionedBy = new mongoose.Types.ObjectId(userId as string);
+      loan.sanctionedBy = new mongoose.Types.ObjectId(userId);
       loan.sanctionedAt = new Date();
     } else {
       loan.status = 'rejected';
@@ -140,8 +143,12 @@ export const disburseLoan = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Loan status must be "sanctioned"' });
     }
 
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     loan.status = 'disbursed';
-    loan.disbursedBy = new mongoose.Types.ObjectId(userId as string);
+    loan.disbursedBy = new mongoose.Types.ObjectId(userId);
     loan.disbursedAt = new Date();
 
     await loan.save();
@@ -192,7 +199,7 @@ export const recordPayment = async (req: AuthRequest, res: Response) => {
 
     // Calculate total paid so far
     const payments = await Payment.find({ loanId });
-    const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+    const totalPaid = payments.reduce((sum: number, p: any) => sum + p.amount, 0);
     const outstandingBalance = loan.totalRepayment - totalPaid;
 
     // Check if amount exceeds outstanding balance
