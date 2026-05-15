@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen bg-slate-950 text-slate-100 antialiased;
+  font-family: var(--font-manrope), 'Segoe UI', sans-serif;
+  background-image:
+    radial-gradient(circle at top, rgba(59, 130, 246, 0.25), transparent 30%),
+    linear-gradient(135deg, #020617 0%, #0f172a 52%, #111827 100%);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.35);
+  color: #fff;
+}
