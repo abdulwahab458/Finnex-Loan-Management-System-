@@ -321,7 +321,8 @@ taskkill /PID <PID> /F
 
 ### CORS Issues
 - Frontend and backend must be on different ports
-- CORS is enabled in Express for localhost
+- Set `CLIENT_URL` on the backend to every allowed frontend origin, for example `http://localhost:3000,https://your-frontend.vercel.app`
+- Authenticated requests send an `Authorization` header, so the browser will preflight them before the actual API call
 
 ### Seed Script Fails
 ```bash

@@ -20,8 +20,14 @@ const allowedOrigins = process.env.CLIENT_URL
   ? process.env.CLIENT_URL.split(',').map((origin) => origin.trim())
   : true;
 
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+};
+
 // Middleware
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
